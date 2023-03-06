@@ -9,6 +9,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      SERVER_PASSWORD: Capibara2019!
+      SERVER_USER: bsmch
+      SERVER_IP: 1
     steps:
     - uses: actions/checkout@v2
     - name: Build the Docker image
@@ -16,4 +20,5 @@ jobs:
         docker build . --tag server:latest
         mkdir out
         docker save -o ./out/serverimage.tar server:latest
-        ls
+        ls out
+        sshpass -p "$SERVER_PASSWORD" scp -o StrictHostKeyChecking=no ./out/serverimage.tar  $SERVER_USER@$SERVER_IP:/home/
