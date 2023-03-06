@@ -43,4 +43,16 @@ CREATE TABLE sensors.suspects (
 	sensors TEXT[]
 );
 
+CREATE TABLE sensors.wanted (
+    person_id TEXT PRIMARY KEY,
+    first_name TEXT NOT NULL,
+	last_name TEXT NOT NULL,
+	photo_src BYTEA NOT NULL,
+	wanted_level INTEGER,
+	wanted BOOL NOT NULL,
+	actions INTEGER[],
+	license_plates TEXT[],
+	car_model TEXT[]
+);
+
 COMMIT;
