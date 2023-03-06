@@ -3,6 +3,7 @@ import psycopg2.extras
 from psycopg2.extensions import AsIs
 import datetime
 
+
 def addToSuspectTable(report):
     conn = psycopg2.connect(
         database="postgres",
@@ -15,8 +16,8 @@ def addToSuspectTable(report):
     cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cursor.execute("SELECT * FROM sensors.person WHERE '" + report['number'] + "' = any (license_plates);")
 
-    result = cursor.fetchone() # assuming every LP has one owner
-    if (result):
+    result = cursor.fetchone()  # assuming every LP has one owner
+    if result:
         result['sensor_id'] = report['sensor_id']
         result['timestamp'] = report['timestamp']
         result['sensor_location_x'] = report['sensor_location_x']
@@ -27,9 +28,10 @@ def addToSuspectTable(report):
 
         cursor.execute("SELECT * FROM sensors.suspects WHERE person_id = " + str(result['person_id']))
         result = cursor.fetchone()
-        if (result):
+        if result:
             update_statement = "UPDATE sensors.suspects SET sensor_id=%s, timestamp=%s, " \
-                               "sensor_location_x=%s, sensor_location_y=%s WHERE person_id = " + str(result['person_id'])
+                               "sensor_location_x=%s, sensor_location_y=%s WHERE person_id = " + \
+                               str(result['person_id'])
             cursor.execute(update_statement, (report['sensor_id'], report['timestamp'],
                                               report['sensor_location_x'], report['sensor_location_y']))
             conn.commit()

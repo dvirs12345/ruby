@@ -10,6 +10,7 @@ print(datetime.datetime.now())
 last_timestamp = datetime.datetime.now() - datetime.timedelta(hours=4, minutes=10)
 print(last_timestamp)
 
+
 def get_changes():
     time.sleep(5)
     connection = psycopg2.connect(
@@ -22,7 +23,7 @@ def get_changes():
 
     cursor = connection.cursor()
 
-    cursor.execute(str("SELECT * FROM sensors.images img WHERE img.sensors_timestamp > '" + str(last_timestamp) + "'"));
+    cursor.execute(str("SELECT * FROM sensors.images img WHERE img.sensors_timestamp > '" + str(last_timestamp) + "'"))
     return cursor.fetchall()
 
 
@@ -41,7 +42,7 @@ while True:
         open("FromDB.jpg", 'wb').write(d[3])
         plate = getLicensePlate()
         # some JSON:
-        x = { "plateId":plate}
+        x = {"plateId": plate}
 
         # parse x:
         y = json.dumps(x)
@@ -50,5 +51,3 @@ while True:
 
 client_socket.close()
 server_socket.close()
-
-
