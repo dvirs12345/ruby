@@ -59,7 +59,6 @@ def addToSuspectTable(report):
                     "wanted_level": result['wanted_level'],
                     "actions": result['actions'],
                     "license_plates": result['license_plates'],
-                    "photo": result['photo']
                     # "car_model": "", # we dont have that field
                 }
 
@@ -82,8 +81,8 @@ def sendLicensePlate(lp):
     url = 'http://%s:%s/license-plates' % (IP, PORT)
     request = {'plate_number': lp}
 
-    res = requests.post(url, json=request)
-    return res.text
+    # res = requests.post(url, json=request)
+    # return res.text
 
 
 #TODO: connect to BI
