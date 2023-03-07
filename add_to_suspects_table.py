@@ -2,8 +2,8 @@ import psycopg2
 import psycopg2.extras
 from psycopg2.extensions import AsIs
 import datetime
-import random
 import requests
+import socket
 
 
 def addToSuspectTable(report):
@@ -19,6 +19,7 @@ def addToSuspectTable(report):
     cursor.execute("SELECT * FROM sensors.person WHERE '" + report['number'] + "' = any (license_plates);")
 
     result = cursor.fetchone() # assuming every LP has one owner
+    print(result['person_id'])
     if (result):
         cursor.execute("SELECT * FROM sensors.suspects WHERE person_id = " + str(result['person_id']))
         suspectResult = cursor.fetchone()
@@ -30,7 +31,8 @@ def addToSuspectTable(report):
                                               report['sensor_location_x'], report['sensor_location_y']))
             conn.commit()
         else:
-            wantedLevel = getWantedLevel()
+            wantedLevel = getWantedLevel(result['person_id'])
+            print(wantedLevel)
 
             result['sensor_id'] = report['sensor_id']
             result['timestamp'] = report['timestamp']
@@ -85,19 +87,30 @@ def sendLicensePlate(lp):
     # return res.text
 
 
-#TODO: connect to BI
-def getWantedLevel():
-    return random.randint(1, 3)
+def getWantedLevel(personId):
+    KEY = 'duhcEFRU8BhZSZbwonbsVWwUOczcn4O=qFCpOoZDjj4X0bn4TEJyhak44jnxOuFFnTj1G1?d04LxsUmva8f-N-46b=Y4F5aCMeTq?OCfngG7DTwz/X-S-luxTO?yQNuX7/22lgo5JFTPX?0S2eWku?HEsD7RRxdrIFAc6!uAg?JE0DlmGL?/G5ZX?bC05ozSB0XtL1yGILCUihJc22EIYNYPB/DOg!0OrfIgseh58s6WdZg6KvK!xKo6n=!DyUFm'
+    headers = {'authorize': KEY}
+
+    r = requests.get("http://10.11.30.212:8000/citizens/tz/" + str(personId), headers=headers)
+
+    return int(r.text)
 
 
 if __name__ == '__main__':
-    exampleReport = {
-        'number': '80-UJI-95',
-        'sensor_id': 'sensor',
-        'timestamp': datetime.datetime.now(),
-        'sensor_location_x': 1,
-        'sensor_location_y': 100
-    }
+    # exampleReport = {
+    #     'number': '80-UJI-95',
+    #     'sensor_id': 'sensor',
+    #     'timestamp': datetime.datetime.now(),
+    #     'sensor_location_x': 1,
+    #     'sensor_location_y': 100
+    # }
 
-    #TODO connect to the BODEL
-    addToSuspectTable(exampleReport)
+    report = {}
+
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    server_socket.bind(('', 8090))
+
+    while True:
+        message, address = server_socket.recvfrom(1024)
+
+        addToSuspectTable(message.decode())
