@@ -6,13 +6,12 @@ import datetime
 import psycopg2
 
 DATA_INDEX = 1
-print(datetime.datetime.now())
-last_timestamp = datetime.datetime.now() - datetime.timedelta(hours=4, minutes=10)
-print(last_timestamp)
+
+last_timestamp = ''
 
 
 def get_changes():
-    time.sleep(5)
+    time.sleep(120)
     connection = psycopg2.connect(
         database="postgres",
         user='postgres',
@@ -23,12 +22,12 @@ def get_changes():
 
     cursor = connection.cursor()
 
-    cursor.execute(str("SELECT * FROM sensors.images img WHERE img.sensors_timestamp > '" + str(last_timestamp) + "'"))
+    cursor.execute(str("SELECT * FROM sensors.images img WHERE img.sensors_timestamp > '" + str(last_timestamp) + "'"));
     return cursor.fetchall()
 
 
 server_socket = socket.socket()
-server_socket.bind(("0.0.0.0", 8820))
+server_socket.bind(("0.0.0.0", 3000))
 server_socket.listen()
 print("Server is up and running")
 (client_socket, client_address) = server_socket.accept()
@@ -41,13 +40,11 @@ while True:
         print(d[3])
         open("FromDB.jpg", 'wb').write(d[3])
         plate = getLicensePlate()
-        # some JSON:
-        x = {"plateId": plate}
-
-        # parse x:
+       
+        x = { "plateId":plate}
         y = json.dumps(x)
         client_socket.send(y.encode())
-        # last_timestamp = datetime.datetime.now()
+        last_timestamp = datetime.datetime.now()
 
 client_socket.close()
 server_socket.close()
