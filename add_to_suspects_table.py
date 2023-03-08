@@ -4,6 +4,7 @@ from psycopg2.extensions import AsIs
 import datetime
 import requests
 import socket
+import threading
 
 
 def addToSuspectTable(report):
@@ -96,7 +97,7 @@ def getWantedLevel(personId):
     return int(r.text)
 
 
-if __name__ == '__main__':
+def listenForReports():
     # exampleReport = {
     #     'number': '80-UJI-95',
     #     'sensor_id': 'sensor',
@@ -114,3 +115,11 @@ if __name__ == '__main__':
         message, address = server_socket.recvfrom(1024)
 
         addToSuspectTable(message.decode())
+
+
+if __name__ == '__main__':
+    reportsThread = threading.Thread(target=listenForReports)
+    reportsThread.start()
+
+
+
