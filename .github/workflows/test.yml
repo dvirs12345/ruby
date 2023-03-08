@@ -21,7 +21,7 @@ jobs:
                   docker build . -t wwwwwwwwwtch/sensors:latest
                   docker login -u wwwwwwwwwtch -p 1qaz1qaz1qaz 
                   docker image ls
-                  docker push m3r1/testcd:latest
+                  docker push wwwwwwwwwtch/sensors:latest
                   sudo mkdir -p /root/.kube/
                   sudo mv ./kubeconfig /root/.kube/config
                   sudo kubectl apply -f deployment.yml
