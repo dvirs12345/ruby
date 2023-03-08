@@ -1,6 +1,7 @@
 CREATE SCHEMA IF NOT EXISTS sensors;
 
 DROP TABLE IF EXISTS sensors.images CASCADE;
+DROP TABLE IF EXISTS sensors.photo;
 DROP TABLE IF EXISTS sensors.person CASCADE;
 DROP TABLE IF EXISTS sensors.suspects CASCADE;
 DROP TABLE IF EXISTS sensors.wanted CASCADE;
@@ -12,6 +13,11 @@ CREATE TABLE sensors.images(
 	latitude FLOAT NOT NULL,
 	image_src BYTEA,
 	sensors_timestamp TIMESTAMP
+);
+
+CREATE TABLE sensors.photo (
+	photo_url TEXT PRIMARY KEY,
+    photo_data TEXT NOT NULL
 );
 
 CREATE TABLE sensors.person (
