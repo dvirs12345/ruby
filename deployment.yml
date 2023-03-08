@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx-deployment
+  name: sensors-deployment
   labels:
-    app: nginx
+    app: sensors
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: nginx
+      app: sensors
   template:
     metadata:
       labels:
-        app: nginx
+        app: sensors
     spec:
       containers:
-      - name: nginx
-        image: nginx:1.14.2
+      - name: sensors
+        image: wwwWWWwwwtch/sensors:latest
         ports:
-        - containerPort: 80
+        - containerPort: 8090
