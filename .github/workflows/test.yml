@@ -22,6 +22,6 @@ jobs:
                   docker login -u wwwwwwwwwtch -p 1qaz1qaz1qaz 
                   docker image ls
                   docker push wwwwwwwwwtch/sensors:latest
-                  sudo mkdir -p /root/.kube/
-                  sudo mv ./kubeconfig /root/.kube/config
-                  sudo kubectl apply -f deployment.yml
+                  #sudo mkdir -p /root/.kube/
+                  #sudo mv ./kubeconfig /root/.kube/config
+                  #sudo kubectl apply -f deployment.yml
