@@ -5,7 +5,7 @@ metadata:
   labels:
     app: sensors
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: sensors
@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: sensors
-        image: wwwWWWwwwtch/sensors:latest
+        image: wwwwwwwwwtch/sensors:latest
         ports:
         - containerPort: 8090
