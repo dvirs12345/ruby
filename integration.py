@@ -2,11 +2,17 @@ import add_to_suspects_table
 import readLicenecePlate
 import psycopg2
 import threading
+import numpy as np
+from psycopg2.pool import ThreadedConnectionPool
 
 #reportsThread = threading.Thread(target=add_to_suspects_table.listenForReports())
 #reportsThread.start()
 
-connection = psycopg2.connect(
+MAX_CONNECTIONS = 55
+
+tcp = ThreadedConnectionPool(
+    1,
+    MAX_CONNECTIONS,
     database="postgres",
     user='postgres',
     password='bagrut3',
@@ -14,14 +20,7 @@ connection = psycopg2.connect(
     port='5432'
 )
 
-cursor = connection.cursor()
-
-cursor.execute(str("SELECT * FROM sensors.images"))
-data = cursor.fetchall()
-
-threads = []
-
-def addSuspect(image):
+def getReport(image):
     open("FromDB.jpg", 'wb').write(image[-2])
     number_plate = readLicenecePlate.getLicensePlate()
     print(number_plate)
@@ -33,13 +32,43 @@ def addSuspect(image):
         'sensor_location_y': image[3]
     }
 
-    addSuspect = threading.Thread(target=add_to_suspects_table.addToSuspectTable, args=(report, ))
-    threads.append(addSuspect)
-    addSuspect.start()
+    return report
 
-for image in data:
-    addSuspect(image)
 
-for currentThread in threads:
-    print(currentThread)
-    currentThread.join()
+def insertToDB(reports):
+    conn = tcp.getconn()
+    add_to_suspects_table.addToSuspectTable(reports, conn)
+    tcp.putconn(conn)
+
+
+if __name__ == '__main__':
+    connection = psycopg2.connect(
+        database="postgres",
+        user='postgres',
+        password='bagrut3',
+        host='10.252.30.4',
+        port='5432'
+    )
+
+    cursor = connection.cursor()
+
+    cursor.execute(str("SELECT * FROM sensors.images"))
+    data = cursor.fetchall()
+
+    reports = []
+
+    for image in data:
+        reports.append(getReport(image))
+
+    splittedReports = np.array_split(reports, MAX_CONNECTIONS)
+
+    threads = []
+
+    for report in splittedReports:
+        addSuspect = threading.Thread(target=insertToDB, args=(reports,))
+        threads.append(addSuspect)
+        addSuspect.start()
+
+    for thread in threads:
+        print(thread)
+        thread.join()
